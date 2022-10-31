@@ -10,57 +10,67 @@ let goldenPadding = {};
 let goldenRatio = {};
 
 function getGoldenRatio() {
-    goldenRatio = {
-        width: container[0].clientWidth / PHI,
-        height: container[0].clientHeight / PHI,
-    }
+  goldenRatio = {
+    width: container[0].clientWidth / PHI,
+    height: container[0].clientHeight / PHI,
+  };
 }
 
 function getGoldenPadding() {
-    goldenPadding = {
-        top: (goldenRatio.height / ( PHI ** 4 )),
-        right: (goldenRatio.width / ( PHI ** 4 )),
-        bottom: (goldenRatio.height / ( PHI ** 3 )) - (goldenRatio.height / ( PHI ** 4 )),
-        left: (goldenRatio.width / ( PHI ** 3 )) - (goldenRatio.width / ( PHI ** 4 )),
-    }
+  goldenPadding = {
+    top: goldenRatio.height / PHI ** 4,
+    right: goldenRatio.width / PHI ** 4,
+    bottom: goldenRatio.height / PHI ** 3 - goldenRatio.height / PHI ** 4,
+    left: goldenRatio.width / PHI ** 3 - goldenRatio.width / PHI ** 4,
+  };
 }
 
 function changeSizeHeading() {
-    sizeHeading.innerText = `${container[0].clientWidth} X ${container[0].clientHeight}`
+  sizeHeading.innerText = `${container[0].clientWidth} X ${container[0].clientHeight}`;
 }
 
 function initCanvas2d() {
-    canvas2d.width = container[0].clientWidth;
-    canvas2d.height = container[0].clientHeight;
+  canvas2d.width = container[0].clientWidth;
+  canvas2d.height = container[0].clientHeight;
 
-    draw2d();
+  draw2d();
 }
 
 function draw2d() {
+  const pointsX = [goldenRatio.height];
+  const pointsY = [
+    goldenRatio.width,
+    // goldenRatio.width + (canvas2d.width - goldenRatio.width) / PHI ** 3,
+  ];
 
-    const pointsY = [
-        0,
-        goldenRatio.width,
-    ]
-
-    function drawYLines() {
-        for( let i = 0; i < pointsY.length; i++ ) {
-            ctx.moveTo(pointsY[i], 0);
-            ctx.lineTo(pointsY[i], canvas2d.height)
-        }
-        ctx.stroke();
+  function drawXLines() {
+    for (let i = 0; i < pointsX.length; i++) {
+      ctx.moveTo(0, pointsX[i]);
+      ctx.lineTo(canvas2d.width, pointsX[i]);
     }
+    ctx.stroke();
+  }
 
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = .1;
-    drawYLines();
+  function drawYLines() {
+    for (let i = 0; i < pointsY.length; i++) {
+      ctx.moveTo(pointsY[i], 0);
+      ctx.lineTo(pointsY[i], canvas2d.height);
+    }
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = "black";
+  ctx.lineWidth = 0.1;
+
+  //   drawXLines();
+  drawYLines();
 }
 
 function onWindowResize() {
-    getGoldenRatio();
-    getGoldenPadding();
-    changeSizeHeading();
-    initCanvas2d();
+  getGoldenRatio();
+  getGoldenPadding();
+  changeSizeHeading();
+  initCanvas2d();
 }
 
 window.addEventListener("resize", onWindowResize);

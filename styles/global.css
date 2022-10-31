@@ -1,75 +1,94 @@
 :root {
-    --threadBlue: #0721c8;
-    --light: #b9bbc6;
-    --dark: black;
-    --white: white;
-    --black: black;
+  --threadBlue: #0721c8;
+  --light: #b9bbc6;
+  --dark: black;
+  --darkBlue: #000016;
+  --darkGreen: #050500;
+  --white: white;
+  --black: black;
 }
 
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    text-decoration: none;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-decoration: none;
 }
+
 html,
 body {
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 
-    font-family: "Helvetica Now Display", sans-serif;
-    font-size: 1vw;
+  font-family: "Helvetica Now Display", sans-serif;
+  font-size: 1vw;
 
-    background-color: var(--threadBlue);
+  background-color: var(--threadBlue);
+}
+
+a {
+  color: inherit;
 }
 
 main {
-    width: 100vw;
-    height: 100vh;
-    /*overflow-y: scroll;*/
+  width: 100vw;
+  height: 100vh;
+  /*overflow-y: scroll;*/
 }
 
 section {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 
-    display: flex;
-    justify-content: center;
+  display: flex;
+  justify-content: center;
 }
 
 .container {
-    width: 100%;
-    height: 100vh;
-    max-width: 1920px;
+  width: 100%;
+  height: 100vh;
+  max-width: 1920px;
 
-    /*font-size: 1em;*/
+  /*font-size: 1em;*/
 
-    background-color: var(--light);
+  background-color: var(--light);
+  position: relative;
 }
 
 .nav_container {
-    height: 100%;
-    width: 100%;
-    max-width: 1920px;
+  height: 100%;
+  width: 100%;
+  max-width: 1920px;
 
-    position: relative;
+  position: relative;
 }
 
 h1 {
-    font-size: 3.33em;
-    font-weight: 350;
+  font-size: 3.33em;
+  font-weight: 350;
 }
 
 p {
-    font-size: 1.04em;
-    max-width: 40ch;
+  font-size: 1.04em;
+  max-width: 40ch;
 }
 
 .canvas2d {
-    position: absolute;
-    top: 0;
-    left: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
 
-    pointer-events: none;
+  pointer-events: none;
+}
+
+::-moz-selection {
+  /* Code for Firefox */
+  color: red;
+  background: yellow;
+}
+
+::selection {
+  color: var(--light);
+  background: var(--darkBlue);
 }
