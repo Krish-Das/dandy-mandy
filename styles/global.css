@@ -6,6 +6,8 @@
   --darkGreen: #050500;
   --white: white;
   --black: black;
+
+  --switzer: "Switzer Variable";
 }
 
 * {
@@ -21,7 +23,7 @@ body {
   height: 100vh;
   overflow: hidden;
 
-  font-family: "Helvetica Now Display", sans-serif;
+  font-family: var(--switzer), sans-serif;
   font-size: 1vw;
 
   background-color: var(--threadBlue);
@@ -70,8 +72,11 @@ h1 {
 }
 
 p {
+  /* font-weight: bold; */
+  font-weight: 500;
   font-size: 1.04em;
-  max-width: 40ch;
+  max-width: 45ch;
+  line-height: 2.4ch;
 }
 
 .canvas2d {

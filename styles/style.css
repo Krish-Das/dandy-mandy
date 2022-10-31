@@ -15,7 +15,6 @@ nav {
 }
 
 .nav_logo {
-  /*TODO: To be set using js*/
   /*height: 100%;*/
   width: 300px;
   position: absolute;
@@ -47,12 +46,15 @@ nav {
 }
 
 .hero_paragraph {
+  opacity: 80%;
+
   position: absolute;
   grid-row-start: 2;
 }
 
 .hero_paragraph p:nth-child(1) {
-  margin-bottom: 3ch;
+  font-weight: 700;
+  margin-bottom: 1.3ch;
 }
 
 .hero_cta_wrapper {

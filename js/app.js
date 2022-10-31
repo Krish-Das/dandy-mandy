@@ -59,6 +59,7 @@ function draw2d() {
     ctx.stroke();
   }
 
+  // TODO: position the lines behind the CTA
   function drawXLines() {
     ctx.moveTo(goldenRatio.width, 0);
     ctx.lineTo(goldenRatio.width, canvas2d.height);
