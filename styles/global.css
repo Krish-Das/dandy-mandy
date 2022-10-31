@@ -15,6 +15,7 @@
   padding: 0;
   box-sizing: border-box;
   text-decoration: none;
+  color: var(--dark);
 }
 
 html,
@@ -77,6 +78,7 @@ p {
   font-size: 1.04em;
   max-width: 45ch;
   line-height: 2.4ch;
+  color: inherit;
 }
 
 .canvas2d {
@@ -93,6 +95,6 @@ p {
 }
 
 ::selection {
-  color: var(--light);
-  background: var(--darkBlue);
+  color: var(--darkBlue);
+  background: #1433ff;
 }
