@@ -59,11 +59,20 @@ function draw2d() {
     ctx.stroke();
   }
 
+  function drawXLines() {
+    ctx.moveTo(goldenRatio.width, 0);
+    ctx.lineTo(goldenRatio.width, canvas2d.height);
+    ctx.moveTo(goldenRatio.width, goldenRatio.height);
+    ctx.lineTo(canvas2d.width, goldenRatio.height);
+    ctx.stroke();
+  }
+
   ctx.strokeStyle = "black";
-  ctx.lineWidth = 0.1;
+  ctx.lineWidth = 0.5;
 
   //   drawXLines();
-  drawYLines();
+  //   drawYLines();
+  drawXLines();
 }
 
 function onWindowResize() {
