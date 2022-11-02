@@ -128,8 +128,19 @@ class WebGL {
 
   orbitControls() {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    // this.controls.enablePan = false;
     this.controls.enableDamping = true;
+
+    // this.controls.enablePan = false;
+    this.controls.enableRotate = false;
+    this.controls.mouseButtons = {
+      LEFT: THREE.MOUSE.PAN,
+      MIDDLE: THREE.MOUSE.DOLLY,
+      RIGHT: THREE.MOUSE.PAN,
+    };
+    this.controls.touches = {
+      ONE: THREE.MOUSE.PAN,
+      TWO: THREE.TOUCH.DOLLY_PAN,
+    };
   }
 
   render() {
