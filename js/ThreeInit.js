@@ -1,13 +1,10 @@
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.118/build/three.module.js";
 import { OrbitControls } from "https://threejsfundamentals.org/threejs/resources/threejs/r122/examples/jsm/controls/OrbitControls.js";
 
-import { vertexShader } from "./shaders/vertexShader.glsl.js";
-import { fragmentShader } from "./shaders/fragmentShader.glsl.js";
+import { vertexShader } from "./shaders/vertexShader.js";
+import { fragmentShader } from "./shaders/fragmentShader.js";
 
 const canvas = document.querySelector(".hero_img_canvas");
-
-let hero_img_texture =
-  "https://images.unsplash.com/photo-1667138325583-a30e62c66e29?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80";
 
 /**
  *
@@ -24,7 +21,8 @@ class WebGL {
     this.perspective = 1;
     this.uMouse = new THREE.Vector2(0, 0);
 
-    this.uTexture = new THREE.TextureLoader().load(hero_img_texture);
+    this.imgIdx = 0;
+    this.hero_img_texture = [];
   }
 
   init() {
@@ -34,11 +32,7 @@ class WebGL {
       canvas,
     });
 
-    this.renderer.setSize(
-      container[0].clientWidth,
-      container[0].clientHeight,
-      false
-    );
+    this.renderer.setSize(innerWidth, innerHeight, false);
     this.renderer.setPixelRatio(window.devicePixelRatio);
 
     this.scene = new THREE.Scene();
@@ -61,8 +55,10 @@ class WebGL {
 
     window.addEventListener("resize", this.onWindowResize.bind(this));
 
-    this.createPlaneMesh();
-    this.OrbitControls();
+    this.getTextures();
+    this.createMesh();
+    this.updateTexture();
+    this.orbitControls();
     this.render();
   }
 
@@ -75,21 +71,29 @@ class WebGL {
   }
 
   onWindowResize() {
-    this.camera.aspect = this.viewport.aspectRatio;
-    // this.camera.fov =
-    //   (50 * (2 * Math.atan(this.viewport.height / 2 / this.perspective))) /
-    //   Math.PI;
+    this.updateTexture();
 
-    this.renderer.setSize(
-      container[0].clientWidth,
-      container[0].clientHeight,
-      false
-    );
+    this.camera.aspect = this.perspective;
+
+    this.renderer.setSize(innerWidth, innerHeight, false);
     this.renderer.setPixelRatio = devicePixelRatio;
     this.camera.updateProjectionMatrix();
   }
 
-  createPlaneMesh() {
+  getTextures() {
+    document.querySelectorAll(".hero_img_container img").forEach((element) => {
+      let { src, width, height } = element;
+      let aspect = width / height;
+
+      this.hero_img_texture.push({ src, width, height, aspect });
+    });
+
+    this.uTexture = new THREE.TextureLoader().load(
+      this.hero_img_texture[this.imgIdx].src
+    );
+  }
+
+  createMesh() {
     const segments = 10;
 
     this.geometry = new THREE.PlaneBufferGeometry(1, 1, segments, segments);
@@ -100,6 +104,7 @@ class WebGL {
         progress: { type: "f", value: 0 },
         uTime: { type: "f", value: 0 },
         uTexture: { type: "t", value: this.uTexture },
+        scale: { type: "v", value: new THREE.Vector2(1, 1) },
       },
       side: THREE.DoubleSide,
       // wireframe: true,
@@ -108,9 +113,22 @@ class WebGL {
     this.scene.add(this.mesh);
   }
 
-  OrbitControls() {
+  updateTexture() {
+    let parentAspect =
+      canvas.parentElement.clientWidth / canvas.parentElement.clientHeight;
+    let imgAspect = this.hero_img_texture[this.imgIdx].aspect;
+    let shaderScale = this.material.uniforms.scale.value;
+
+    if (imgAspect > parentAspect) {
+      shaderScale.set(imgAspect / parentAspect, 1);
+    } else {
+      shaderScale.set(1, parentAspect / imgAspect);
+    }
+  }
+
+  orbitControls() {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
-    this.controls.enablePan = false;
+    // this.controls.enablePan = false;
     this.controls.enableDamping = true;
   }
 
