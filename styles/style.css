@@ -80,7 +80,7 @@ nav {
   background-position: center;
   background-size: cover;
 
-  /* overflow: hidden; */
+  overflow: hidden;
 }
 
 .hero_img_canvas {
@@ -88,6 +88,11 @@ nav {
   height: 100%;
 
   /* background-color: red; */
+}
+.hero_img_canvas:focus,
+.hero_img_canvas:active {
+  border: none;
+  outline: none;
 }
 
 .hero_cta_btn {

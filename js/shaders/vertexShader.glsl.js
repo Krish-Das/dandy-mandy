@@ -1,8 +1,9 @@
 export const vertexShader = `
-uniform float time;
+uniform float uTime;
+
 varying vec2 vUv;
 varying vec3 vPosition;
-uniform vec2 pixels;
+
 float PI = 3.141592653589793;
 
 void main() {
