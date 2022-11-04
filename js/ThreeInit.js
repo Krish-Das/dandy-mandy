@@ -17,15 +17,38 @@ function convertRad(angle) {
 
 class WebGL {
   constructor() {
-    this.time = 0;
-    this.perspective = 1;
-    this.uMouse = new THREE.Vector2(0, 0);
-
     this.imgIdx = 0;
+
+    this.pixelSize = 100; // ?: control -> total distortion pixel | number | no range
+
+    this.introSpeed = 90; // ?: control -> % | range(0 - 100)
+    this.introStregnth = 10; // ?: control -> throw stregnth of intro animation | % | range(0 - 100)
+
+    this.radiusClamp = 100; // ?: control -> % | range(1 - 100)
+    this.effectRadius = 8; // ?: control -> blobsize | % | range(1 - 100)
+    this.mousePower = 20; // ?: control -> throw stregnth of the mouse | number | no range
+
+    this.maxRadiusClamp = 3; // TODO: Make it dependent on this.pixelSize
+
     this.hero_img_texture = [];
   }
-
   init() {
+    this.time = 0;
+    this.perspective = 1;
+
+    this.uMouse = new THREE.Vector2();
+    this.uMouseSpeed = new THREE.Vector2();
+    this.prevMouse = new THREE.Vector2();
+
+    this.pixelSize = Math.floor(this.pixelSize);
+    this.imgRes = this.pixelSize ** 2;
+
+    // Normalizing and ranging
+    this.introStregnth = Math.floor(255 * (this.introStregnth / 100)); // ?: range -> (0, 255)
+    this.effectRadius = (this.pixelSize * this.effectRadius) / 100;
+    this.introSpeed = this.introSpeed / 100;
+    this.radiusClamp = (1 / (this.radiusClamp / 100)) * this.maxRadiusClamp;
+
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
@@ -58,16 +81,23 @@ class WebGL {
     this.getTextures();
     this.createMesh();
     this.updateTexture();
+    window.addEventListener("mousemove", this.onMouseMove.bind(this)); // TODO: change position
     this.orbitControls();
     this.render();
   }
 
-  onMouseMove() {
-    window.addEventListener("mousemove", (e) => {
-      e.preventDefault;
-      this.uMouse.x = e.clientX / this.viewport.width;
-      this.uMouse.y = 1.0 - e.clientY / this.viewport.height;
-    });
+  onMouseMove(e) {
+    e.preventDefault;
+    this.uMouse.x = e.clientX / this.viewport.width;
+    this.uMouse.y = 1.0 - e.clientY / this.viewport.height;
+    this.material.uniforms.uMouse.value = this.uMouse;
+
+    // calculating the mouse speed
+    this.uMouseSpeed.x = this.uMouse.x - this.prevMouse.x;
+    this.uMouseSpeed.y = this.uMouse.y - this.prevMouse.y;
+
+    this.prevMouse.x = this.uMouse.x;
+    this.prevMouse.y = this.uMouse.y;
   }
 
   onWindowResize() {
@@ -94,6 +124,8 @@ class WebGL {
   }
 
   createMesh() {
+    this.initDataTexture();
+
     const segments = 10;
 
     this.geometry = new THREE.PlaneBufferGeometry(1, 1, segments, segments);
@@ -105,6 +137,8 @@ class WebGL {
         uTime: { type: "f", value: 0 },
         uTexture: { type: "t", value: this.uTexture },
         scale: { type: "v", value: new THREE.Vector2(1, 1) },
+        uDataTexture: { type: "t", value: this.dataTexture },
+        uMouse: { type: "vector2", value: this.uMouse },
       },
       side: THREE.DoubleSide,
       // wireframe: true,
@@ -126,6 +160,71 @@ class WebGL {
     }
   }
 
+  initDataTexture() {
+    // TODO: Fix the lines below
+    // segments
+    // this.imgWidth = this.hero_images[this.imgIdx].width / this.pixelClamp;
+    // this.imgHeight = this.hero_images[this.imgIdx].height / this.pixelClamp;
+
+    const data = new Float32Array(4 * this.imgRes);
+
+    for (let i = 0; i < this.imgRes; i++) {
+      const r = Math.random() * this.introStregnth;
+
+      const stride = i * 4;
+
+      data[stride] = r; // Horizontal animation
+      data[stride + 1] = r; // Vertical Animation
+    }
+
+    // used the buffer to create a DataTexture
+    this.dataTexture = new THREE.DataTexture(
+      data,
+      this.pixelSize,
+      this.pixelSize,
+      THREE.RGBFormat,
+      THREE.FloatType
+    );
+    this.dataTexture.needsUpdate = true;
+
+    this.dataTexture.magFilter = this.dataTexture.minFilter =
+      THREE.NearestFilter;
+  }
+
+  updateDataTexture() {
+    let data = this.dataTexture.image.data;
+    let maxdist = (this.pixelSize / this.effectRadius) ** this.radiusClamp;
+    let gridMouse = {
+      x: this.pixelSize * this.uMouse.x,
+      y: this.pixelSize * this.uMouse.y,
+    };
+
+    // intro animation:
+    for (let i = 0; i < data.length; i += 3) {
+      data[i] *= this.introSpeed;
+      data[i + 1] *= this.introSpeed;
+    }
+
+    for (let i = 0; i < this.pixelSize; i++) {
+      for (let j = 0; j < this.pixelSize; j++) {
+        let distance = (gridMouse.x - i) ** 2 + (gridMouse.y - j) ** 2;
+
+        if (distance < maxdist) {
+          let index = (i + this.pixelSize * j) * 3;
+          let power = (Math.sqrt(distance) / maxdist) * this.mousePower;
+
+          data[index] += this.uMouseSpeed.x * power;
+          data[index + 1] += this.uMouseSpeed.y * power;
+        }
+      }
+    }
+
+    this.uMouseSpeed.x *= 0.9;
+    this.uMouseSpeed.y *= 0.9;
+
+    this.dataTexture.needsUpdate = true;
+  }
+
   orbitControls() {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
@@ -145,6 +244,7 @@ class WebGL {
 
   render() {
     this.controls.update();
+    this.updateDataTexture();
 
     this.time += 0.01;
     this.material.uniforms.uTime.value = this.time;
