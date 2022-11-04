@@ -82,7 +82,7 @@ class WebGL {
     this.createMesh();
     this.updateTexture();
     window.addEventListener("mousemove", this.onMouseMove.bind(this)); // TODO: change position
-    this.orbitControls();
+    // this.orbitControls();
     this.render();
   }
 
@@ -243,7 +243,7 @@ class WebGL {
   }
 
   render() {
-    this.controls.update();
+    // this.controls.update();
     this.updateDataTexture();
 
     this.time += 0.01;
